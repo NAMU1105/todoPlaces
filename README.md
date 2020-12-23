@@ -1,8 +1,10 @@
 # todoPlaces
 
-<img width="500" height="350" src="https://user-images.githubusercontent.com/47317129/103020379-9eaf6e80-458b-11eb-82eb-fb8a7d8a3bd0.PNG" style="display: inline">
+<div style="display: flex">
+<img width="500" height="350" src="https://user-images.githubusercontent.com/47317129/103020379-9eaf6e80-458b-11eb-82eb-fb8a7d8a3bd0.PNG">
 
-<img width="500"  height="350" src="https://user-images.githubusercontent.com/47317129/103020283-76c00b00-458b-11eb-8095-d476d9e34c1a.PNG" style="display: inline" >
+<img width="500"  height="350" src="https://user-images.githubusercontent.com/47317129/103020283-76c00b00-458b-11eb-8095-d476d9e34c1a.PNG">
+</div>
 
 <!-- <img width="500" src="https://user-images.githubusercontent.com/47317129/103020372-9c4d1480-458b-11eb-9ee0-fd4d4e1d3161.PNG" style="display: block" > -->
 
@@ -26,9 +28,11 @@
 - ###### 장소 등록
 
 <br><br>
+
+<div style="display: flex">
 <img width="500" height="350" src="https://user-images.githubusercontent.com/47317129/103020381-9f480500-458b-11eb-8e67-ce67a5ff5009.PNG"  >
 <img width="500" height="350" src="https://user-images.githubusercontent.com/47317129/103020379-9eaf6e80-458b-11eb-82eb-fb8a7d8a3bd0.PNG"  >
-
+</div>
 - ###### 유저 리스트 및 해당 유저가 올린 장소 확인
 
 ## How I built it
