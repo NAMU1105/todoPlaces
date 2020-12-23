@@ -1,10 +1,10 @@
 # todoPlaces
 
-<img width="500" height="350" src="https://user-images.githubusercontent.com/47317129/103020379-9eaf6e80-458b-11eb-82eb-fb8a7d8a3bd0.PNG" >
+<img width="500" height="350" src="https://user-images.githubusercontent.com/47317129/103020379-9eaf6e80-458b-11eb-82eb-fb8a7d8a3bd0.PNG" style="display: inline">
 
-<img width="500"  height="350" src="https://user-images.githubusercontent.com/47317129/103020283-76c00b00-458b-11eb-8095-d476d9e34c1a.PNG"  >
+<img width="500"  height="350" src="https://user-images.githubusercontent.com/47317129/103020283-76c00b00-458b-11eb-8095-d476d9e34c1a.PNG" style="display: inline" >
 
-<img width="500" src="https://user-images.githubusercontent.com/47317129/103020372-9c4d1480-458b-11eb-9ee0-fd4d4e1d3161.PNG" style="display: block" >
+<!-- <img width="500" src="https://user-images.githubusercontent.com/47317129/103020372-9c4d1480-458b-11eb-9ee0-fd4d4e1d3161.PNG" style="display: block" > -->
 
 ## Inspiration
 
