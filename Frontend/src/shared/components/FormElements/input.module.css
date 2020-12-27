@@ -1,0 +1,42 @@
+.form {
+  margin: 1rem 0;
+}
+
+.form label,
+.form input,
+.form textarea {
+  display: block;
+}
+
+.form label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form input,
+.form textarea {
+  width: 100%;
+  font: inherit;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  padding: 0.15rem 0.25rem;
+  resize: none;
+}
+
+.form input:focus,
+.form textarea:focus {
+  outline: none;
+  background: #ebebeb;
+  border-color: #510077;
+}
+
+.formInvalid label,
+.formInvalid p {
+  color: red;
+}
+
+.formInvalid input,
+.formInvalid textarea {
+  border-color: red;
+  background: #ffd1d1;
+}
