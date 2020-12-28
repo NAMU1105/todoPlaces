@@ -1,6 +1,8 @@
+const mongoose = require("mongoose");
+const fs = require("fs");
+
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
-const mongoose = require("mongoose");
 
 const HttpError = require("../models/http-errors");
 const getCoordsForAddress = require("../util/location");
@@ -8,12 +10,7 @@ const User = require("../models/user");
 const Place = require("../models/place");
 
 const getPlaceById = async (req, res, next) => {
-  const placeId = req.params.pid; // { pid: 'p1' }
-
-  //   const place = DUMMY_PLACES.find((p) => {
-  //     return p.id === placeId;
-  //   });
-
+  const placeId = req.params.pid;
   let place;
   try {
     place = await Place.findById(placeId);
@@ -61,6 +58,9 @@ const getPlacesByUserId = async (req, res, next) => {
   });
 };
 
+// ******************************************************************************
+// createPlace
+// ******************************************************************************
 const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -143,32 +143,15 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
+// ******************************************************************************
+// updatePlace
+// ******************************************************************************
 const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("Invalid inputs passed, please check your data.", 422);
-    // res.status(422).json({
-    //   message: ` Invalid inputs passed, please check your data.`,
-    // });
   }
 
-  //   const place = DUMMY_PLACES.find((p) => {
-  //     return p.id === placeId;
-  //   });
-
-  //   if (!place) {
-  //     // throw new HttpError("Could not find a place for the provided id.", 404);
-  //     res.status(404).json({ message: `no such place. ${placeId}` });
-  //   }
-
-  //   const updatedPlace = { ...place };
-  //   //   const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
-  //   const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
-
-  //   updatedPlace.title = title;
-  //   updatedPlace.description = description;
-
-  //   DUMMY_PLACES[placeIndex] = updatedPlace;
   const { title, description } = req.body;
   const placeId = req.params.pid;
 
@@ -180,6 +163,11 @@ const updatePlace = async (req, res, next) => {
       "Something went wrong, could not update place.",
       500
     );
+    return next(error);
+  }
+
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to edit this place.", 401);
     return next(error);
   }
 
@@ -200,15 +188,11 @@ const updatePlace = async (req, res, next) => {
   res.status(200).json({ place: place.toObject({ getters: true }) });
 };
 
+// ******************************************************************************
+// deletePlace
+// ******************************************************************************
 const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
-  //   if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
-  //     // throw new HttpError("Could not find a place for that id.", 404);
-  //     res.status(404).json({
-  //       message: ` Could not find a place for that id.`,
-  //     });
-  //   }
-  //   DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
 
   let place;
   try {
@@ -226,6 +210,14 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  if (place.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "You are not allowed to delete this place.",
+      403
+    );
+    return next(error);
+  }
+
   try {
     // const sess = await mongoose.startSession();
     // sess.startTransaction();
@@ -240,6 +232,11 @@ const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+  // remove place image from server
+  fs.unlink(place.image, (err) => {
+    console.log(err);
+  });
 
   res.status(200).json({ message: "Place deleted." });
 };

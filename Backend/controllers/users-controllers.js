@@ -8,6 +8,8 @@ const HttpError = require("../models/http-errors");
 const User = require("../models/user");
 // const Place = require("../models/place");
 
+const HOUR = 60;
+
 const getAllUsers = async (req, res, next) => {
   let users;
   try {
@@ -112,8 +114,8 @@ const signup = async (req, res, next) => {
       "secret",
       { expiresIn: "1h" }
     );
-    console.log(`jwtTkoen: `, jwtToken);
-  } catch (error) {
+    console.log(`token:`, token);
+  } catch (err) {
     const error = new HttpError("Signing up failed, please try again.", 500);
     return next(error);
   }
@@ -155,7 +157,7 @@ const login = async (req, res, next) => {
     // if (!existingUser || existingUser.password !== password) {
     const error = new HttpError(
       "Invalid credentials, could not log you in.",
-      401
+      403
     );
     return next(error);
   }
@@ -179,7 +181,7 @@ const login = async (req, res, next) => {
   if (!hashCompare) {
     const error = new HttpError(
       "Invalid credentials, could not log you in.",
-      401
+      403
     );
     return next(error);
   }
@@ -192,9 +194,14 @@ const login = async (req, res, next) => {
       "secret",
       { expiresIn: "1h" }
     );
-    console.log(`jwtTkoen: `, jwtToken);
-  } catch (error) {
-    const error = new HttpError("Signing up failed, please try again.", 500);
+    console.log(`token: `, token);
+  } catch (err) {
+    console.log(err);
+
+    const error = new HttpError(
+      "Logging in failed, please try again later.",
+      500
+    );
     return next(error);
   }
 
@@ -202,10 +209,15 @@ const login = async (req, res, next) => {
   //   message: "Logged in!",
   //   user: existingUser.toObject({ getters: true }),
   // });
+  // const tokenExpirationDate = new Date(new Date().getTime() + 1000 * 10);
+  const tokenExpirationDate = new Date(new Date().getTime() + 1000 * 60 * HOUR);
+  console.log(`tokenExpirationDate:`, tokenExpirationDate);
+
   res.json({
     userId: existingUser.id,
     email: existingUser.email,
     token: token,
+    expirationDate: tokenExpirationDate,
   });
 };
 
