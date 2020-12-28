@@ -1,19 +1,40 @@
-import React, { useCallback, useReducer } from "react";
+import { useCallback, useReducer } from "react";
+
+// let isLogin = true;
+// console.log(`isLogin: `, isLogin);
 
 const formReducer = (state, action) => {
+  // console.log("action: ", action);
+  // console.log("state: ", state);
+
   switch (action.type) {
     case "INPUT_CHANGE":
       let formIsAllValid = true;
-      // console.log(action);
-      // console.log(state);
 
       for (const inputId in state.inputs) {
+        // console.log("inputId: ", inputId);
+        // console.log(state.inputs[inputId]);
+        // console.log("action.id: ", action.id);
+        if (!state.inputs[inputId]) {
+          continue;
+        }
         if (inputId === action.id) {
           formIsAllValid = formIsAllValid && action.isValid;
         } else {
+          // if (
+          //   (state.inputs["type"] === "LOGIN" && inputId === "name") ||
+          //   (state.inputs["type"] === "LOGIN" && inputId === "image") ||
+          //   inputId === "type"
+          // ) {
+          //   console.log("here");
+          //   continue;
+          // }
+
           formIsAllValid = formIsAllValid && state.inputs[inputId].isValid;
         }
       }
+      // console.log("state: ", state);
+      // console.log("formIsAllValid: ", formIsAllValid);
 
       return {
         ...state,
@@ -39,13 +60,16 @@ const formReducer = (state, action) => {
 };
 
 export const useForm = (initialValue, initialFormValidity) => {
+  // console.log("initialValue: ", initialValue);
+  // console.log("initialFormValidity: ", initialFormValidity);
+
   const [formState, dispatch] = useReducer(formReducer, {
     inputs: initialValue,
     areValid: initialFormValidity,
   });
 
   const inputHandler = useCallback((id, value, isValid) => {
-    console.log(id, value, isValid);
+    // console.log(id, value, isValid);
 
     dispatch({
       type: "INPUT_CHANGE",
@@ -64,6 +88,12 @@ export const useForm = (initialValue, initialFormValidity) => {
       areValid: initialFormValidity,
     });
   }, []);
+
+  // const changeAuthType = (value) => {
+  //   console.log(`changeAuthType, isLoginMode: `, value);
+  //   isLogin = value;
+  //   console.log(`isLogin: `, isLogin);
+  // };
 
   return [formState, inputHandler, setFormData];
 };

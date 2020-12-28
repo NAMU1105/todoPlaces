@@ -1,8 +1,8 @@
 import React from "react";
 
 import PlaceItem from "./placeItem";
-import Card from "../../shared/components/UIElements/card";
-import Button from "../../shared/components/FormElements/button";
+// import Card from "../../shared/components/UIElements/card";
+// import Button from "../../shared/components/FormElements/button";
 
 import styles from "./placeList.module.css";
 

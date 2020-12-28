@@ -13,7 +13,7 @@ import { URL_BASE } from "../../shared/util/urls";
 
 import styles from "./placeItem.module.css";
 let inMounted = false;
-let count = 0;
+// let count = 0;
 
 const PlaceItem = ({
   id,
@@ -81,7 +81,7 @@ const PlaceItem = ({
     console.log("confirmDeleteHandler, inMounted: ", inMounted);
     console.log("delete confirmed");
     // count++;
-    onDelete(id);
+    // onDelete(id);
 
     setIsLoading(true);
 
@@ -90,6 +90,7 @@ const PlaceItem = ({
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
         },
       });
       const responseData = await response.json();
@@ -97,6 +98,8 @@ const PlaceItem = ({
         throw new Error(responseData.message);
       }
       console.log(responseData);
+      // update user's place list
+      onDelete(id);
 
       inMounted && setIsLoading(false);
 

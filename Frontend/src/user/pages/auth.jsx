@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 
 import Card from "../../shared/components/UIElements/card";
 import Input from "../../shared/components/FormElements/input";
@@ -12,11 +12,10 @@ import {
   VALIDATOR_REQUIRE,
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
-  VALIDATOR_MAXLENGTH,
 } from "../../shared/util/validators";
 import { URL_LOGIN, URL_SIGNUP } from "../../shared/util/urls.js";
 import { AuthContext } from "../../shared/context/auth-context";
-// import {useForm } from "../../shared/hooks/form-hooks.js"
+import { useForm } from "../../shared/hooks/form-hooks.js";
 // import { useHttpClient } from "../../shared/hooks/http-hooks";
 
 import styles from "./auth.module.css";
@@ -24,76 +23,29 @@ import styles from "./auth.module.css";
 const LOGIN = "LOGIN";
 const SIGNUP = "SIGNUP";
 
-const formReducer = (state, action) => {
-  switch (action.type) {
-    case "INPUT_CHANGE":
-      let formIsAllValid = true;
-      // console.log(action);
-      // console.log(state);
-
-      for (const inputId in state.inputs) {
-        if (inputId === action.id) {
-          formIsAllValid = formIsAllValid && action.isValid;
-        } else {
-          // name, image 인풋의 입력값은 로그인일경우에 체크하지 않음
-          if (
-            (state.authType === LOGIN && inputId === "name") ||
-            (state.authType === LOGIN && inputId === "image")
-          ) {
-            // console.log("here");
-            continue;
-          }
-          formIsAllValid = formIsAllValid && state.inputs[inputId].isValid;
-        }
-      }
-      return {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.id]: {
-            value: action.val,
-            isValid: action.isValid,
-          },
-        },
-        areValid: formIsAllValid,
-      };
-
-    case "AUTH_TYPE_CHANGE":
-      let newAuthType = "";
-      if (state.authType === LOGIN) {
-        newAuthType = SIGNUP;
-      } else {
-        newAuthType = LOGIN;
-      }
-      return {
-        ...state,
-        authType: newAuthType,
-      };
-
-    default:
-      return state;
-  }
-};
-
 const Auth = (props) => {
   // const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  // const { formState, inputHandler, setFormData } = useForm();
 
   const auth = useContext(AuthContext);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  // const [authType, setAuthType] = useState(LOGIN);
+  const [isLoginMode, setIsLoginMode] = useState(true);
   // const [modalIsOpen, setModalOpen] = useState(false);
 
-  const [formState, dispatch] = useReducer(formReducer, {
-    inputs: {
-      name: {
-        value: "",
-        isValid: false,
-      },
-      image: {
-        value: "",
-        isValid: false,
-      },
+  const [formState, inputHandler, setFormData] = useForm(
+    {
+      // type: authType,
+      // name: {
+      //   value: "",
+      //   isValid: false,
+      // },
+      // image: {
+      //   value: "",
+      //   isValid: false,
+      // },
       email: {
         value: "",
         isValid: false,
@@ -103,17 +55,50 @@ const Auth = (props) => {
         isValid: false,
       },
     },
-    authType: LOGIN,
-    areValid: false,
-  });
+    false
+  );
+
+  const switchModeHandler = () => {
+    if (!isLoginMode) {
+      // console.log("로그인으로 전환!");
+      setFormData(
+        {
+          ...formState.inputs,
+          // Drop irrelevant input fields
+          name: undefined,
+          image: undefined,
+        },
+        formState.inputs.email.isValid && formState.inputs.password.isValid
+      );
+
+      // changeAuthType(true);
+    } else {
+      setFormData(
+        {
+          ...formState.inputs,
+          name: {
+            value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
+            isValid: false,
+          },
+        },
+        false
+      );
+      // changeAuthType(false);
+    }
+    setIsLoginMode((prevMode) => !prevMode);
+  };
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState);
+    // console.log(formState);
 
     setIsLoading(true);
 
-    if (formState.authType === LOGIN) {
+    if (isLoginMode) {
       try {
         const response = await fetch(URL_LOGIN, {
           method: "POST",
@@ -134,8 +119,14 @@ const Auth = (props) => {
 
         // console.log("login success");
         setIsLoading(false);
-        auth.login(responseData.user.id);
-        // console.log(formState);
+        // auth.login(responseData.user.id);
+        // console.log(`responseData.userId: `, responseData.userId);
+
+        auth.login({
+          userId: responseData.userId,
+          token: responseData.token,
+          expirationDate: responseData.expirationDate,
+        });
       } catch (error) {
         setIsLoading(false);
         setError(error);
@@ -165,7 +156,8 @@ const Auth = (props) => {
         }
         // console.log(`responseData: `, responseData);
         setIsLoading(false);
-        auth.login(responseData.user.id);
+        auth.login({ userId: responseData.userId, token: responseData.token });
+        // auth.login(responseData.user.id);
         // console.log(formState);
       } catch (error) {
         setIsLoading(false);
@@ -173,22 +165,6 @@ const Auth = (props) => {
         // console.log(error);
       }
     }
-  };
-
-  const inputHandler = useCallback((id, value, isValid) => {
-    console.log(id, value, isValid);
-    dispatch({
-      type: "INPUT_CHANGE",
-      id: id,
-      val: value,
-      isValid: isValid,
-    });
-  }, []);
-
-  const changeAuthTypeHandler = () => {
-    dispatch({
-      type: "AUTH_TYPE_CHANGE",
-    });
   };
 
   const errorHandler = () => {
@@ -210,10 +186,10 @@ const Auth = (props) => {
       )}
       <Card className={styles.authentication}>
         {isLoading && <LoadingSpinner asOverlay />}
-        <h1>{formState.authType === LOGIN ? LOGIN : SIGNUP}</h1>
+        <h1>{isLoginMode ? LOGIN : SIGNUP}</h1>
         <hr />
         <form onSubmit={authSubmitHandler}>
-          {formState.authType === SIGNUP && (
+          {!isLoginMode && (
             <>
               <Input
                 id="name"
@@ -264,15 +240,15 @@ const Auth = (props) => {
                 marginTop: 0.5 + "rem",
               }}
             >
-              {formState.authType === LOGIN ? LOGIN : SIGNUP}
+              {isLoginMode ? LOGIN : SIGNUP}
             </Button>
             <Button
               inverse
               type="button"
-              onClick={changeAuthTypeHandler}
+              onClick={switchModeHandler}
               style={{ marginRight: 0 + "rem" }}
             >
-              SWITCH TO {formState.authType === LOGIN ? SIGNUP : LOGIN}
+              SWITCH TO {isLoginMode ? SIGNUP : LOGIN}
             </Button>
           </div>
         </form>

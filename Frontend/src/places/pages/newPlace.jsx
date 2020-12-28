@@ -60,6 +60,7 @@ const NewPlace = () => {
       formData.append("address", formState.inputs.address.value);
       formData.append("image", formState.inputs.image.value);
       formData.append("creator", auth.userID);
+      // formData.append("token", auth.token);
 
       const response = await fetch(URL_CREATE_PLACE, {
         method: "POST",
@@ -67,6 +68,7 @@ const NewPlace = () => {
         //   "Content-Type": "application/json",
         // },
         body: formData,
+        headers: { Authorization: "Bearer " + auth.token },
         //  JSON.stringify({
         //   title: formState.inputs.title.value,
         //   description: formState.inputs.description.value,
